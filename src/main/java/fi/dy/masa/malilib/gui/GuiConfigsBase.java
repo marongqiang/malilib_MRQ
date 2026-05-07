@@ -27,7 +27,9 @@ public abstract class GuiConfigsBase extends GuiListBase<ConfigOptionWrapper, Wi
     protected final ButtonPressDirtyListenerSimple dirtyListener = new ButtonPressDirtyListenerSimple();
     protected final String modId;
     protected ConfigButtonKeybind activeKeybindButton;
-    protected int configWidth = 204;
+    // Keep the right-side control column compact so long translated labels
+    // fit on one line without overlapping the controls.
+    protected int configWidth = 170;
     @Nullable protected IConfigInfoProvider hoverInfoProvider;
     @Nullable protected IDialogHandler dialogHandler;
 
@@ -103,6 +105,15 @@ public abstract class GuiConfigsBase extends GuiListBase<ConfigOptionWrapper, Wi
     {
         return new WidgetListConfigOptions(listX, listY,
                 this.getBrowserWidth(), this.getBrowserHeight(), this.getConfigWidth(), 0.f, this.useKeybindSearch(), this);
+    }
+
+    /**
+     * Public accessor for external helpers (such as the global masa mod switcher)
+     * that want to save/restore GUI state without living in the GUI package.
+     */
+    public WidgetListConfigOptions getConfigListWidget()
+    {
+        return this.getListWidget();
     }
 
     @Override
@@ -236,12 +247,14 @@ public abstract class GuiConfigsBase extends GuiListBase<ConfigOptionWrapper, Wi
         private final Type type;
         @Nullable private final IConfigBase config;
         @Nullable private final String label;
+        private final int indent;
 
         public ConfigOptionWrapper(IConfigBase config)
         {
             this.type = Type.CONFIG;
             this.config = config;
             this.label = null;
+            this.indent = 0;
         }
 
         public ConfigOptionWrapper(String label)
@@ -249,6 +262,23 @@ public abstract class GuiConfigsBase extends GuiListBase<ConfigOptionWrapper, Wi
             this.type = Type.LABEL;
             this.config = null;
             this.label = label;
+            this.indent = 0;
+        }
+
+        public ConfigOptionWrapper(String label, int indent)
+        {
+            this.type = Type.LABEL;
+            this.config = null;
+            this.label = label;
+            this.indent = indent;
+        }
+
+        public ConfigOptionWrapper(IConfigBase config, int indent)
+        {
+            this.type = Type.CONFIG;
+            this.config = config;
+            this.label = null;
+            this.indent = Math.max(0, indent);
         }
 
         public Type getType()
@@ -266,6 +296,11 @@ public abstract class GuiConfigsBase extends GuiListBase<ConfigOptionWrapper, Wi
         public String getLabel()
         {
             return this.label;
+        }
+
+        public int getIndent()
+        {
+            return this.indent;
         }
 
         public static List<ConfigOptionWrapper> createFor(Collection<? extends IConfigBase> configs)

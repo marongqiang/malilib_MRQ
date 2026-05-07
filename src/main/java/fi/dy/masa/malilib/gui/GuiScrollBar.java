@@ -111,7 +111,7 @@ public class GuiScrollBar
 
     public void handleDrag(int mouseY, int barTravel)
     {
-        if (this.dragging)
+        if (this.dragging && barTravel > 0)
         {
             float valuePerPixel = (float) this.maxValue / barTravel;
             this.setValue((int) (this.dragStartValue + ((mouseY - this.dragStartY) * valuePerPixel)));

@@ -2,6 +2,7 @@ package fi.dy.masa.malilib.gui.widgets;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -276,13 +277,27 @@ public abstract class WidgetFileBrowserBase extends WidgetListBase<DirectoryEntr
 
         if (this.currentDirectoryIsRoot() == false &&
             parent != null &&
-            this.currentDirectory.getAbsolutePath().contains(this.getRootDirectory().getAbsolutePath()))
+            isWithinRoot(parent))
         {
             this.switchToDirectory(parent);
         }
         else
         {
             this.switchToRootDirectory();
+        }
+    }
+
+    private boolean isWithinRoot(File file)
+    {
+        try
+        {
+            String rootPath = this.getRootDirectory().getCanonicalPath();
+            String filePath = file.getCanonicalPath();
+            return filePath.equals(rootPath) || filePath.startsWith(rootPath + File.separator);
+        }
+        catch (IOException e)
+        {
+            return false;
         }
     }
 

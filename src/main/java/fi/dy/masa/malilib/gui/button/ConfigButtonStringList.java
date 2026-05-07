@@ -31,6 +31,12 @@ public class ConfigButtonStringList extends ButtonGeneric
     {
         super.onMouseClickedImpl(mouseX, mouseY, mouseButton);
 
+        if (this.config.hasCustomStringListEditor())
+        {
+            this.config.openCustomStringListEditor(this.configGui, this.dialogHandler, GuiUtils.getCurrentScreen());
+            return true;
+        }
+
         if (this.dialogHandler != null)
         {
             this.dialogHandler.openDialog(new GuiStringListEdit(this.config, this.configGui, this.dialogHandler, null));
@@ -46,6 +52,16 @@ public class ConfigButtonStringList extends ButtonGeneric
     @Override
     public void updateDisplayString()
     {
+        if (this.config.hasCustomStringListEditor())
+        {
+            String s = this.config.getStringListButtonDisplayString(this.width - 10);
+            if (s != null && s.isEmpty() == false)
+            {
+                this.displayString = s;
+                return;
+            }
+        }
+
         this.displayString = StringUtils.getClampedDisplayStringRenderlen(this.config.getStrings(), this.width - 10, "[ ", " ]");
     }
 }

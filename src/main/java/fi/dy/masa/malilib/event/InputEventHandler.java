@@ -144,8 +144,6 @@ public class InputEventHandler implements IKeybindManager, IInputManager
         // Update the cached pressed keys status
         KeybindMulti.onKeyInputPre(keyCode, scanCode, modifiers, action);
 
-        boolean cancel = this.checkKeyBindsForChanges(keyCode);
-
         if (this.keyboardHandlers.isEmpty() == false)
         {
             for (IKeyboardInputHandler handler : this.keyboardHandlers)
@@ -158,6 +156,7 @@ public class InputEventHandler implements IKeybindManager, IInputManager
             }
         }
 
+        boolean cancel = this.checkKeyBindsForChanges(keyCode);
         return cancel;
     }
 

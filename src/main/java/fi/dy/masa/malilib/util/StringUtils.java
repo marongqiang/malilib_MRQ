@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.MaLiLibConfigs;
 
 public class StringUtils
 {
+    private static final Pattern PATTERN_COLOR_HEX = Pattern.compile("(?:0x|#)([a-fA-F0-9]{1,8})");
     public static String getModVersionString(String modId)
     {
         for (net.fabricmc.loader.api.ModContainer container : net.fabricmc.loader.api.FabricLoader.getInstance().getAllMods())
@@ -35,8 +36,7 @@ public class StringUtils
      */
     public static int getColor(String colorStr, int defaultColor)
     {
-        Pattern pattern = Pattern.compile("(?:0x|#)([a-fA-F0-9]{1,8})");
-        Matcher matcher = pattern.matcher(colorStr);
+        Matcher matcher = PATTERN_COLOR_HEX.matcher(colorStr);
 
         if (matcher.matches())
         {

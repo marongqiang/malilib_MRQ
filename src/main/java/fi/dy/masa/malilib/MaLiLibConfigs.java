@@ -5,8 +5,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fi.dy.masa.malilib.config.ConfigUtils;
+import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IConfigHandler;
-import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -22,7 +22,7 @@ public class MaLiLibConfigs implements IConfigHandler
         public static final ConfigHotkey    OPEN_GUI_CONFIGS        = new ConfigHotkey("openGuiConfigs", "A,C", "Open the in-game malilib config GUI");
         public static final ConfigBoolean   REALMS_COMMON_CONFIG    = new ConfigBoolean("realmsCommonConfig", true, "Whether or not to use a common config file name for all realms servers.\nIf this is disabled, then the server IP and port are used in the generated config file names.\nHowever, apparently the Realms server addresses change regularly, so the config names would change\nall the time and thus the configs wouldn't save properly.\nSo basically leave this enabled if you only play on one Realms server.\nIf you play on multiple Realms... then the configs will get mixed up regardless.\nUnless you play on the different servers on different Minecraft instances\nto keep the configs separated by the Minecraft instance.");
 
-        public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 IGNORED_KEYS,
                 OPEN_GUI_CONFIGS,
                 REALMS_COMMON_CONFIG
@@ -36,7 +36,7 @@ public class MaLiLibConfigs implements IConfigHandler
         public static final ConfigBoolean KEYBIND_DEBUG_ACTIONBAR   = new ConfigBoolean("keybindDebuggingIngame", true, "If enabled, then the messages from 'keybindDebugging'\nare also printed to the in-game action bar");
         public static final ConfigBoolean MOUSE_SCROLL_DEBUG        = new ConfigBoolean("mouseScrollDebug", false, "If enabled, some debug values from mouse scrolling\nare printed to the game console/log");
 
-        public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 INPUT_CANCELLATION_DEBUG,
                 KEYBIND_DEBUG,
                 KEYBIND_DEBUG_ACTIONBAR,

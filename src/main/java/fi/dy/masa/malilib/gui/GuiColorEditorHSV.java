@@ -836,7 +836,7 @@ public class GuiColorEditorHSV extends GuiDialogBase
                             break;
                         case R:
                             val = MathHelper.clamp(val, 0, 255);
-                            colorNew = (colorOld & 0x00FFFF) | (val << 16);
+                            colorNew = (colorOld & 0xFF00FFFF) | (val << 16);
                             break;
                         case G:
                             val = MathHelper.clamp(val, 0, 255);

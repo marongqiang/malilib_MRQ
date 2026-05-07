@@ -85,6 +85,22 @@ public class GuiTextFieldGeneric extends TextFieldWidget
         return this;
     }
 
+    // Compatibility helpers used by masa mods across versions
+    public int getCursorPosition()
+    {
+        return this.getCursor();
+    }
+
+    public void setCursorPosition(int pos)
+    {
+        this.setCursor(pos);
+    }
+
+    public void setCursorPositionEnd()
+    {
+        this.setCursorToEnd();
+    }
+
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float partialTicks)
     {

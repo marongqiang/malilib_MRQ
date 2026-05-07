@@ -20,10 +20,17 @@ import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetLabel;
+import fi.dy.masa.malilib.gui.widgets.WidgetMasaModSwitcher;
 import fi.dy.masa.malilib.gui.wrappers.TextFieldWrapper;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.render.MessageRenderer;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.compat.masatools.MasaModList;
+import fi.dy.masa.malilib.compat.masatools.MasaModRouter;
+import fi.dy.masa.malilib.compat.masatools.MasaScreenId;
+import fi.dy.masa.malilib.compat.masatools.MasaScreenStateStore;
+import fi.dy.masa.malilib.compat.masatools.MasaModId;
+import fi.dy.masa.malilib.compat.masatools.MasaModEntry;
 import fi.dy.masa.malilib.util.KeyCodes;
 
 public abstract class GuiBase extends Screen implements IMessageConsumer, IStringConsumer
@@ -74,6 +81,7 @@ public abstract class GuiBase extends Screen implements IMessageConsumer, IStrin
     protected boolean useTitleHierarchy = true;
     private int keyInputCount;
     private double mouseWheelDeltaSum;
+    @Nullable private WidgetMasaModSwitcher masaModSwitcher;
     @Nullable
     private Screen parent;
 
@@ -138,12 +146,42 @@ public abstract class GuiBase extends Screen implements IMessageConsumer, IStrin
         super.init();
 
         this.initGui();
+        MasaScreenStateStore.restoreIfPresent(this);
         this.openTime = System.nanoTime();
     }
 
     public void initGui()
     {
         this.clearElements();
+
+        this.masaModSwitcher = null;
+
+        // Only show for the masa family mods we explicitly support
+        MasaModId current = MasaScreenId.getModIdForScreen(this);
+
+        if (current != null)
+        {
+            List<MasaModEntry> entries = MasaModList.getLoadedMasaMods();
+
+            if (entries.isEmpty() == false)
+            {
+                this.masaModSwitcher = new WidgetMasaModSwitcher(0, 10, -1, 15, 150, 10, entries, MasaModRouter::switchTo);
+
+                // Select current mod by default (best-effort)
+                for (MasaModEntry e : entries)
+                {
+                    if (e != null && e.id == current)
+                    {
+                        this.masaModSwitcher.setSelectedEntry(e);
+                        break;
+                    }
+                }
+
+                int x = this.width - 10 - this.masaModSwitcher.getWidth();
+                this.masaModSwitcher.setPosition(Math.max(10, x), 10);
+                this.addWidget(this.masaModSwitcher);
+            }
+        }
     }
 
     protected void closeGui(boolean showParent)
@@ -262,6 +300,11 @@ public abstract class GuiBase extends Screen implements IMessageConsumer, IStrin
 
     public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
+        if (this.masaModSwitcher != null)
+        {
+            this.masaModSwitcher.handleGlobalMouseClick(mouseX, mouseY, mouseButton);
+        }
+
         for (ButtonBase button : this.buttons)
         {
             if (button.onMouseClicked(mouseX, mouseY, mouseButton))
@@ -284,8 +327,23 @@ public abstract class GuiBase extends Screen implements IMessageConsumer, IStrin
 
         if (handled == false)
         {
+            // Ensure the masa mod switcher dropdown always gets first pick for clicks
+            // when the mouse is over it, regardless of widget insertion order.
+            if (this.masaModSwitcher != null && this.widgets.contains(this.masaModSwitcher) &&
+                this.masaModSwitcher.isMouseOver(mouseX, mouseY) &&
+                this.masaModSwitcher.onMouseClicked(mouseX, mouseY, mouseButton))
+            {
+                return true;
+            }
+
             for (WidgetBase widget : this.widgets)
             {
+                // Switcher already handled above (and must stay on top)
+                if (widget == this.masaModSwitcher)
+                {
+                    continue;
+                }
+
                 if (widget.isMouseOver(mouseX, mouseY) && widget.onMouseClicked(mouseX, mouseY, mouseButton))
                 {
                     // Don't call super if the button press got handled
@@ -319,8 +377,21 @@ public abstract class GuiBase extends Screen implements IMessageConsumer, IStrin
             }
         }
 
+        // Ensure the masa mod switcher dropdown always consumes scroll first when open/hovered.
+        if (this.masaModSwitcher != null && this.widgets.contains(this.masaModSwitcher) &&
+            this.masaModSwitcher.isMouseOver(mouseX, mouseY) &&
+            this.masaModSwitcher.onMouseScrolled(mouseX, mouseY, mouseWheelDelta))
+        {
+            return true;
+        }
+
         for (WidgetBase widget : this.widgets)
         {
+            if (widget == this.masaModSwitcher)
+            {
+                continue;
+            }
+
             if (widget.onMouseScrolled(mouseX, mouseY, mouseWheelDelta))
             {
                 // Don't call super if the action got handled
@@ -575,13 +646,32 @@ public abstract class GuiBase extends Screen implements IMessageConsumer, IStrin
 
         if (this.widgets.isEmpty() == false)
         {
+            // Always render the masa mod switcher last (on top), even if other screens
+            // add their list widgets after calling super.initGui().
+            WidgetBase switcher = (this.masaModSwitcher != null && this.widgets.contains(this.masaModSwitcher)) ? this.masaModSwitcher : null;
+
             for (WidgetBase widget : this.widgets)
             {
+                if (widget == switcher)
+                {
+                    continue;
+                }
+
                 widget.render(mouseX, mouseY, false, drawContext);
 
                 if (widget.isMouseOver(mouseX, mouseY))
                 {
                     this.hoveredWidget = widget;
+                }
+            }
+
+            if (switcher != null)
+            {
+                switcher.render(mouseX, mouseY, false, drawContext);
+
+                if (switcher.isMouseOver(mouseX, mouseY))
+                {
+                    this.hoveredWidget = switcher;
                 }
             }
         }

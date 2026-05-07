@@ -17,7 +17,7 @@ public class ConfigDouble extends ConfigBase<ConfigDouble> implements IConfigDou
 
     public ConfigDouble(String name, double defaultValue, String comment)
     {
-        this(name, defaultValue, Double.MIN_VALUE, Double.MAX_VALUE, comment);
+        this(name, defaultValue, -Double.MAX_VALUE, Double.MAX_VALUE, comment);
     }
 
     public ConfigDouble(String name, double defaultValue, double minValue, double maxValue, String comment)

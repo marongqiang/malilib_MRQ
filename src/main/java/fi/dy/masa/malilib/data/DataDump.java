@@ -576,16 +576,16 @@ public class DataDump
 
         try
         {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
             int size = lines.size();
 
-            for (int i = 0; i < size; i++)
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile)))
             {
-                writer.write(lines.get(i));
-                writer.newLine();
+                for (int i = 0; i < size; i++)
+                {
+                    writer.write(lines.get(i));
+                    writer.newLine();
+                }
             }
-
-            writer.close();
         }
         catch (IOException e)
         {

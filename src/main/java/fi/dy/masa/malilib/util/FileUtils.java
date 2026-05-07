@@ -140,9 +140,11 @@ public class FileUtils
         {
             try
             {
-                FileInputStream is = new FileInputStream(file);
-                NbtCompound nbt = NbtIo.readCompressed(is);
-                is.close();
+                NbtCompound nbt;
+                try (FileInputStream is = new FileInputStream(file))
+                {
+                    nbt = NbtIo.readCompressed(is);
+                }
                 return nbt;
             }
             catch (Exception e)

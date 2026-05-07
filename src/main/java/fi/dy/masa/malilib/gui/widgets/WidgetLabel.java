@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
 import fi.dy.masa.malilib.render.RenderUtils;
@@ -79,10 +81,78 @@ public class WidgetLabel extends WidgetBase
                 }
                 else
                 {
-                    this.drawStringWithShadow(this.x, yTextStart + i * fontHeight, this.textColor, text, drawContext);
+                    this.drawClippedStringWithShadow(this.x, yTextStart + i * fontHeight, this.textColor, text, drawContext);
                 }
             }
         }
+    }
+
+    /**
+     * Clip left-aligned text to this widget's width, without changing the string (no "..." generation).
+     */
+    protected void drawClippedStringWithShadow(int x, int y, int color, String text, DrawContext drawContext)
+    {
+        if (this.width <= 0)
+        {
+            return;
+        }
+
+        boolean clip = this.getStringWidth(text) > this.width;
+
+        if (clip)
+        {
+            this.enableTextClip();
+        }
+
+        try
+        {
+            this.drawStringWithShadow(x, y, color, text, drawContext);
+        }
+        finally
+        {
+            if (clip)
+            {
+                this.disableTextClip();
+            }
+        }
+    }
+
+    private void enableTextClip()
+    {
+        MinecraftClient client = MinecraftClient.getInstance();
+        int sh = (int) ((double) client.getWindow().getFramebufferHeight() / client.getWindow().getScaleFactor());
+        int sx1 = (int) this.x;
+        int sy1 = (int) (sh - (this.y + this.height));
+        int swBox = (int) this.width;
+        int shBox = (int) this.height;
+        if (swBox < 1)
+        {
+            swBox = 1;
+        }
+        if (shBox < 1)
+        {
+            shBox = 1;
+        }
+        if (sx1 < 0)
+        {
+            swBox += sx1;
+            sx1 = 0;
+        }
+        if (sy1 < 0)
+        {
+            shBox += sy1;
+            sy1 = 0;
+        }
+        if (swBox < 1 || shBox < 1)
+        {
+            return;
+        }
+        RenderSystem.enableScissor(sx1, sy1, swBox, shBox);
+    }
+
+    private void disableTextClip()
+    {
+        RenderSystem.disableScissor();
     }
 
     protected void drawLabelBackground()

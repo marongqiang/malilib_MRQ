@@ -3,6 +3,7 @@ package fi.dy.masa.malilib;
 import java.util.Collections;
 import java.util.List;
 import fi.dy.masa.malilib.config.IConfigBase;
+import fi.dy.masa.malilib.MaLiLib;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -12,6 +13,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 public class MaLiLibConfigGui extends GuiConfigsBase
 {
     private static ConfigGuiTab tab = ConfigGuiTab.GENERIC;
+    private static boolean loggedOptionsOnce;
 
     public MaLiLibConfigGui()
     {
@@ -65,6 +67,19 @@ public class MaLiLibConfigGui extends GuiConfigsBase
         if (tab == ConfigGuiTab.GENERIC)
         {
             configs = MaLiLibConfigs.Generic.OPTIONS;
+
+            if (loggedOptionsOnce == false)
+            {
+                loggedOptionsOnce = true;
+                MaLiLib.logger.info("MaLiLib Generic.OPTIONS size = {}", configs.size());
+                for (IConfigBase cfg : configs)
+                {
+                    if (cfg != null)
+                    {
+                        MaLiLib.logger.info("  - {}", cfg.getName());
+                    }
+                }
+            }
         }
         else if (tab == ConfigGuiTab.DEBUG)
         {

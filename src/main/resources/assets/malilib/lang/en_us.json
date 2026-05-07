@@ -115,5 +115,11 @@
     "malilib.message.moved_min_layer_to": "Moved min layer to %s",
     "malilib.message.set_layer_axis_to": "Set layer axis to %s",
     "malilib.message.set_layer_mode_to": "Set layer mode to %s",
-    "malilib.message.set_layer_to": "Set layer to %s"
+    "malilib.message.set_layer_to": "Set layer to %s",
+
+    "malilib.masa_switcher.error.target_not_loaded": "Target mod is not loaded, please check your mod list",
+    "malilib.masa_switcher.mod.litematica": "Litematica",
+    "malilib.masa_switcher.mod.tweakeroo": "Tweakeroo",
+    "malilib.masa_switcher.mod.minihud": "MiniHUD",
+    "malilib.masa_switcher.mod.itemscroller": "Item Scroller"
 }
